@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register / Sign In | Your Site</title>
+  <link rel="stylesheet" href="register.css" />
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+    .container { max-width: 400px; margin: auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);}
+    h1, h2 { text-align: center; }
+    .tabs { display: flex; justify-content: center; margin-bottom: 20px; }
+    .tabs button { flex: 1; padding: 10px; cursor: pointer; border: none; background: #ddd; }
+    .tabs button.active { background: #1e3a8a; color: #fff; font-weight: bold; }
+    form { display: none; }
+    form.active { display: block; }
+    label { display: block; margin: 10px 0 5px; }
+    input, select { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    .password-wrapper { position: relative; }
+    .password-wrapper button { position: absolute; right: 10px; top: 10px; border: none; background: none; cursor: pointer; }
+    .submit-btn { width: 100%; padding: 12px; background: #1e3a8a; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    .submit-btn:hover { background: #374ba0; }
+    p { text-align: center; margin-top: 10px; }
+    a { color: #1e3a8a; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="tabs">
+      <button id="tab-register" class="active">Register</button>
+      <button id="tab-signin">Sign In</button>
+    </div>
+
+    <form id="register-form" class="active">
+      <h1>Join Our Community</h1>
+      <label for="nickname">Nickname</label>
+      <input type="text" id="nickname" name="nickname" placeholder="Your nickname" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="Your email" required />
+
+      <label for="gender">Gender</label>
+      <select id="gender" name="gender" required>
+        <option value="">Select your gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="password">Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" name="password" placeholder="Create password" required />
+        <button type="button" id="toggleRegisterPassword">👁️</button>
+      </div>
+
+      <button type="submit" class="submit-btn">Register</button>
+      <p><a href="#" id="scroll-signin">Already have an account? Sign In</a></p>
+      <p><a href="index.html">Back to Home Page</a></p>
+    </form>
+
+    <form id="signin-form">
+      <h2>Sign In</h2>
+      <label for="signin-email">Email</label>
+      <input type="email" id="signin-email" placeholder="Enter your email" required />
+
+      <label for="signin-password">Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="signin-password" placeholder="Enter your password" required />
+        <button type="button" id="toggleSignInPassword">👁️</button>
+      </div>
+
+      <button type="submit" class="submit-btn">Sign In</button>
+      <p><a href="#" id="scroll-register">Don't have an account? Register</a></p>
+      <p><a href="index.html">Back to Home Page</a></p>
+    </form>
+  </div>
+
+  <script>
+    emailjs.init("m9732buII9gWqwXQ-"); 
+
+    const tabRegister = document.getElementById("tab-register");
+    const tabSignIn = document.getElementById("tab-signin");
+    const registerForm = document.getElementById("register-form");
+    const signinForm = document.getElementById("signin-form");
+
+    function showRegister() {
+      tabRegister.classList.add("active");
+      tabSignIn.classList.remove("active");
+      registerForm.classList.add("active");
+      signinForm.classList.remove("active");
+    }
+
+    function showSignIn() {
+      tabSignIn.classList.add("active");
+      tabRegister.classList.remove("active");
+      signinForm.classList.add("active");
+      registerForm.classList.remove("active");
+    }
+
+    tabRegister.addEventListener("click", showRegister);
+    tabSignIn.addEventListener("click", showSignIn);
+
+    document.getElementById("scroll-signin").addEventListener("click", (e) => {
+      e.preventDefault(); showSignIn();
+    });
+
+    document.getElementById("scroll-register").addEventListener("click", (e) => {
+      e.preventDefault(); showRegister();
+    });
+
+    document.getElementById("toggleRegisterPassword").addEventListener("click", () => {
+      const pw = document.getElementById("password");
+      pw.type = pw.type === "password" ? "text" : "password";
+    });
+
+    document.getElementById("toggleSignInPassword").addEventListener("click", () => {
+      const pw = document.getElementById("signin-password");
+      pw.type = pw.type === "password" ? "text" : "password";
+    });
+
+    const fields = ["nickname","email","gender","password"];
+    fields.forEach(id => {
+      const field = document.getElementById(id);
+      field.addEventListener("input", () => {
+        localStorage.setItem(id, field.value);
+      });
+    });
+
+    window.addEventListener("load", () => {
+      if (fields.some(id => localStorage.getItem(id))) {
+        if (confirm("Restore previous input information?")) {
+          fields.forEach(id => {
+            const saved = localStorage.getItem(id);
+            if (saved) document.getElementById(id).value = saved;
+          });
+        } else {
+          fields.forEach(id => localStorage.removeItem(id));
+        }
+      }
+    });
+
+    registerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const formData = {
+        nickname: document.getElementById("nickname").value,
+        email: document.getElementById("email").value,
+        gender: document.getElementById("gender").value,
+        password: document.getElementById("password").value
+      };
+
+      emailjs.send("service_sqqkn0k", "template_6klyx36", formData)
+        .then(() => {
+          localStorage.setItem(formData.email, JSON.stringify(formData));2
+          fields.forEach(id => localStorage.removeItem(id));
+          alert("Registration successful! Redirecting...");
+          window.location.href = "index.html";
+        }, (err) => {
+          console.error("EmailJS Error:", err);
+          alert("❌ Something went wrong. Check EmailJS configuration.");
+        });
+    });
+
+    signinForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signin-email").value;
+      const password = document.getElementById("signin-password").value;
+
+      const storedData = JSON.parse(localStorage.getItem(email));
+      if (storedData && storedData.password === password) {
+        alert("✅ Sign In Successful!");
+        window.location.href = "index.html";
+      } else {
+        alert("❌ Invalid email or password!");
+      }
+    });
+  </script>
+
+</body>
+</html>

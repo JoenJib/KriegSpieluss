@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+  <link rel="stylesheet">
+  <style>
+    /* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+/* BODY */
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #1c1c1c;
+}
+
+/* CONTAINER (Main box) */
+.container {
+  background-color: #fff;
+  width: 100%;
+  max-width: 380px;
+  padding: 2.5rem 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* TITLE */
+.container h2 {
+  font-size: 1.8rem;
+  color: #111;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+/* INPUT FIELDS */
+.input-box {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.input-box input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: border 0.3s;
+}
+
+.input-box input:focus {
+  border: 1px solid #0078ff;
+}
+
+/* BUTTON */
+.btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #0078ff;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background-color: #005fcc;
+}
+
+/* SWITCH LINK (login/register) */
+.switch {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.switch a {
+  color: #0078ff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.switch a:hover {
+  text-decoration: underline;
+}
+
+/* COPYRIGHT FOOTER */
+.footer {
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* FADE-IN ANIMATION */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .container {
+    width: 90%;
+    padding: 2rem 1.5rem;
+  }
+
+  .container h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* FILE MANAGER DESIGN */
+.file-manager {
+  max-width: 800px;
+}
+
+.upload-section {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.file-area h3 {
+  margin-bottom: 0.8rem;
+  color: #111;
+  text-align: left;
+}
+
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.file-card {
+  background: #f4f4f4;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  transition: 0.2s;
+  position: relative;
+}
+
+.file-card:hover {
+  transform: translateY(-3px);
+}
+
+.file-icon {
+  font-size: 2.5rem;
+  color: #0078ff;
+  margin-bottom: 0.5rem;
+}
+
+.file-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-date {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 3px;
+}
+
+.file-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+  gap: 0.4rem;
+}
+
+.small-btn {
+  background-color: #0078ff;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  padding: 5px 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: 0.2s;
+}
+
+.small-btn.delete {
+  background-color: #e74c3c;
+}
+
+.small-btn:hover {
+  opacity: 0.9;
+}
+
+.logout-btn {
+  background-color: #333;
+  margin-top: 1.5rem;
+}
+
+.logout-btn:hover {
+  background-color: #555;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container file-manager">
+    <h2>My Backupfiles</h2>
+
+    <div class="upload-section">
+      <input type="file" id="fileInput" multiple />
+      <button class="btn" onclick="saveFiles()">Upload Files</button>
+    </div>
+
+    <div class="file-area">
+      <h3>Stored Files</h3>
+      <div id="fileGrid" class="file-grid"></div>
+    </div>
+
+    <button class="btn logout-btn" onclick="logout()">Logout</button>
+    <p><a href="index.html">Back to Home Page</a></p>
+
+
+  <script>
+
+// ===============================
+// FILE MANAGER LOGIC
+// ===============================
+
+document.addEventListener("DOMContentLoaded", () => {
+  const currentUser = localStorage.getItem("currentUser");
+  if (!currentUser) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  displayFileGrid();
+});
+
+// Save selected files into localStorage
+function saveFiles() {
+  const fileInput = document.getElementById("fileInput");
+  const files = fileInput?.files;
+
+  if (!files || files.length === 0) {
+    alert("Please select at least one file!");
+    return;
+  }
+
+  const storedFiles = JSON.parse(localStorage.getItem("savedFiles") || "[]");
+
+  Array.from(files).forEach((file) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      storedFiles.push({
+        name: file.name,
+        content: event.target.result,
+        date: new Date().toLocaleString(),
+      });
+      localStorage.setItem("savedFiles", JSON.stringify(storedFiles));
+      displayFileGrid();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  fileInput.value = "";
+}
+
+// Display stored files in a grid
+function displayFileGrid() {
+  const fileGrid = document.getElementById("fileGrid");
+  if (!fileGrid) return;
+
+  const files = JSON.parse(localStorage.getItem("savedFiles") || "[]");
+  fileGrid.innerHTML = "";
+
+  if (files.length === 0) {
+    fileGrid.innerHTML = "<p>No files stored yet.</p>";
+    return;
+  }
+
+  files.forEach((file, index) => {
+    const div = document.createElement("div");
+    div.className = "file-card";
+    div.innerHTML = `
+      <div class="file-icon">📄</div>
+      <div class="file-name">${file.name}</div>
+      <div class="file-date">${file.date}</div>
+      <div class="file-actions">
+        <button class="small-btn" onclick="downloadFile(${index})">Download</button>
+        <button class="small-btn delete" onclick="deleteFile(${index})">Delete</button>
+      </div>
+    `;
+    fileGrid.appendChild(div);
+  });
+}
+
+// Download stored file
+function downloadFile(index) {
+  const files = JSON.parse(localStorage.getItem("savedFiles") || "[]");
+  const file = files[index];
+  const a = document.createElement("a");
+  a.href = file.content;
+  a.download = file.name;
+  a.click();
+}
+
+// Delete stored file
+function deleteFile(index) {
+  const files = JSON.parse(localStorage.getItem("savedFiles") || "[]");
+  files.splice(index, 1);
+  localStorage.setItem("savedFiles", JSON.stringify(files));
+  displayFileGrid();
+}
+
+// Logout
+function logout() {
+  localStorage.removeItem("currentUser");
+  window.location.href = "login.html";
+}
+
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login / Register</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #1c1c1c;
+    }
+    .container {
+      background-color: #fff;
+      width: 100%;
+      max-width: 380px;
+      padding: 2.5rem 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+      text-align: center;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .container h2 {
+      font-size: 1.8rem;
+      color: #111;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+    .input-box {
+      width: 100%;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .input-box input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      outline: none;
+      transition: border 0.3s;
+    }
+    .input-box input:focus {
+      border: 1px solid #0078ff;
+    }
+    .toggle-pass {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #0078ff;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #0078ff;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background-color: #005fcc;
+    }
+    .switch {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: #333;
+    }
+    .switch a {
+      color: #0078ff;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .switch a:hover {
+      text-decoration: underline;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 480px) {
+      .container { width: 90%; padding: 2rem 1.5rem; }
+      .container h2 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="loginContainer">
+    <h2>Login</h2>
+    <div class="input-box">
+      <input type="text" id="loginUser" placeholder="Username" required>
+    </div>
+    <div class="input-box">
+      <input type="password" id="loginPass" placeholder="Password" required>
+      <button class="toggle-pass" type="button" onclick="togglePassword('loginPass', this)">Show</button>
+    </div>
+    <button class="btn" onclick="login()">Login</button>
+    <div class="switch">
+      Don’t have an account? <a onclick="toggleForm('register')">Register</a>
+      <p><a href="index.html">Back to Home Page</a></p>
+    </div>
+  </div>
+
+  <div class="container" id="registerContainer" style="display:none;">
+    <h2>Create Account</h2>
+    <div class="input-box">
+      <input type="text" id="regUser" placeholder="Username" required>
+    </div>
+    <div class="input-box">
+      <input type="password" id="regPass" placeholder="Password" required>
+      <button class="toggle-pass" type="button" onclick="togglePassword('regPass', this)">Show</button>
+    </div>
+    <div class="input-box">
+      <input type="password" id="confirmPass" placeholder="Confirm Password" required>
+      <button class="toggle-pass" type="button" onclick="togglePassword('confirmPass', this)">Show</button>
+    </div>
+    <button class="btn" onclick="register()">Register</button>
+    <div class="switch">
+      Already have an account? <a onclick="toggleForm('login')">Login</a>
+    </div>
+  </div>
+
+  <script>
+    function toggleForm(form) {
+      document.getElementById("loginContainer").style.display = form === "login" ? "block" : "none";
+      document.getElementById("registerContainer").style.display = form === "register" ? "block" : "none";
+    }
+
+    function togglePassword(id, btn) {
+      const field = document.getElementById(id);
+      if (field.type === "password") {
+        field.type = "text";
+        btn.textContent = "Hide";
+      } else {
+        field.type = "password";
+        btn.textContent = "Show";
+      }
+    }
+
+    function register() {
+      const user = document.getElementById('regUser').value.trim();
+      const pass = document.getElementById('regPass').value.trim();
+      const confirm = document.getElementById('confirmPass').value.trim();
+
+      if (!user || !pass || !confirm) {
+        alert("Please fill out all fields.");
+        return;
+      }
+
+      if (pass !== confirm) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      if (localStorage.getItem(user)) {
+        alert("Username already exists. Try another one.");
+        return;
+      }
+
+      localStorage.setItem(user, pass);
+      alert("Registration successful! Redirecting to home...");
+      localStorage.setItem("currentUser", user);
+      window.location.href = "home.html";
+    }
+
+    function login() {
+      const user = document.getElementById('loginUser').value.trim();
+      const pass = document.getElementById('loginPass').value.trim();
+
+      if (!user || !pass) {
+        alert("Please fill out all fields.");
+        return;
+      }
+
+      const storedPass = localStorage.getItem(user);
+      if (storedPass === pass) {
+        localStorage.setItem("currentUser", user);
+        alert("Login successful!");
+        window.location.href = "home.html";
+      } else {
+        alert("Invalid username or password.");
+      }
+    }
+
+    window.onload = () => {
+      if (localStorage.getItem("currentUser")) {
+        window.location.href = "home.html";
+      }
+    };
+  </script>
+</body>
+</html>
