@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register / Sign In | Your Site</title>
+  <link rel="stylesheet" href="register.css" />
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <style>
+    
+    body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+    .container { max-width: 400px; margin: auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);}
+    h1, h2 { text-align: center; }
+    .tabs { display: flex; justify-content: center; margin-bottom: 20px; }
+    .tabs button { flex: 1; padding: 10px; cursor: pointer; border: none; background: #ddd; }
+    .tabs button.active { background: #1e3a8a; color: #fff; font-weight: bold; }
+    form { display: none; }
+    form.active { display: block; }
+    label { display: block; margin: 10px 0 5px; }
+    input, select { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+    .password-wrapper { position: relative; }
+    .password-wrapper button { position: absolute; right: 10px; top: 10px; border: none; background: none; cursor: pointer; }
+    .submit-btn { width: 100%; padding: 12px; background: #1e3a8a; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    .submit-btn:hover { background: #374ba0; }
+    p { text-align: center; margin-top: 10px; }
+    a { color: #1e3a8a; text-decoration: none; }
+
+    .message { min-height: 1.4em; margin-bottom: 10px; padding: 6px 10px; border-radius: 6px; font-size: 0.95em; display: none; }
+    .message.error { display:block; background: #ffe6e6; color: #b00020; border: 1px solid #f5c2c2; }
+    .message.success { display:block; background: #e6fff0; color: #067a3b; border: 1px solid #bfeccf; }
+    .input-error { border-color: #b00020 !important; box-shadow: 0 0 0 3px rgba(176,0,32,0.06); }
+    .field-error { color: #b00020; font-size: 0.85em; margin-top: -6px; margin-bottom: 8px; display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="tabs">
+      <button id="tab-register" class="active">Register</button>
+      <button id="tab-signin">Sign In</button>
+    </div>
+
+    <form id="register-form" class="active">
+      <h1>Join Our Community</h1>
+
+      <div id="register-message" class="message" role="status" aria-live="polite"></div>
+
+      <label for="nickname">Nickname</label>
+      <input type="text" id="nickname" name="nickname" placeholder="Your nickname" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="Your email" required />
+
+      <label for="gender">Gender</label>
+      <select id="gender" name="gender" required>
+        <option value="">Select your gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="password">Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" name="password" placeholder="Create password" required />
+        <button type="button" id="toggleRegisterPassword">👁️</button>
+      </div>
+
+      <button type="submit" class="submit-btn">Register</button>
+      <p><a href="#" id="scroll-signin">Already have an account? Sign In</a></p>
+      <p><a href="index.html">Back to Home Page</a></p>
+    </form>
+
+    <form id="signin-form">
+      <h2>Sign In</h2>
+
+      <div id="signin-message" class="message" role="status" aria-live="polite"></div>
+
+      <label for="signin-email">Email</label>
+      <input type="email" id="signin-email" placeholder="Enter your email" required />
+
+      <label for="signin-password">Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="signin-password" placeholder="Enter your password" required />
+        <button type="button" id="toggleSignInPassword">👁️</button>
+      </div>
+
+      <button type="submit" class="submit-btn">Sign In</button>
+      <p><a href="#" id="scroll-register">Don't have an account? Register</a></p>
+      <p><a href="index.html">Back to Home Page</a></p>
+    </form>
+  </div>
+
+  <script>
+    emailjs.init("YOUR_PUBLIC_KEY"); 
+
+    const tabRegister = document.getElementById("tab-register");
+    const tabSignIn = document.getElementById("tab-signin");
+    const registerForm = document.getElementById("register-form");
+    const signinForm = document.getElementById("signin-form");
+
+    function showRegister() {
+      tabRegister.classList.add("active");
+      tabSignIn.classList.remove("active");
+      registerForm.classList.add("active");
+      signinForm.classList.remove("active");
+      clearFormMessage(registerForm);
+      clearFormMessage(signinForm);
+    }
+
+    function showSignIn() {
+      tabSignIn.classList.add("active");
+      tabRegister.classList.remove("active");
+      signinForm.classList.add("active");
+      registerForm.classList.remove("active");
+      clearFormMessage(registerForm);
+      clearFormMessage(signinForm);
+    }
+
+    tabRegister.addEventListener("click", showRegister);
+    tabSignIn.addEventListener("click", showSignIn);
+
+    document.getElementById("scroll-signin").addEventListener("click", (e) => {
+      e.preventDefault(); showSignIn();
+    });
+
+    document.getElementById("scroll-register").addEventListener("click", (e) => {
+      e.preventDefault(); showRegister();
+    });
+
+    document.getElementById("toggleRegisterPassword").addEventListener("click", () => {
+      const pw = document.getElementById("password");
+      pw.type = pw.type === "password" ? "text" : "password";
+    });
+
+    document.getElementById("toggleSignInPassword").addEventListener("click", () => {
+      const pw = document.getElementById("signin-password");
+      pw.type = pw.type === "password" ? "text" : "password";
+    });
+
+    const fields = ["nickname","email","gender"];
+    fields.forEach(id => {
+      const field = document.getElementById(id);
+      if (!field) return;
+      field.addEventListener("input", () => {
+        localStorage.setItem(id, field.value);
+      });
+    });
+
+    window.addEventListener("load", () => {
+      if (fields.some(id => localStorage.getItem(id))) {
+        if (confirm("Restore previous input information? (Passwords are not saved)")) {
+          fields.forEach(id => {
+            const saved = localStorage.getItem(id);
+            if (saved) document.getElementById(id).value = saved;
+          });
+        } else {
+          fields.forEach(id => localStorage.removeItem(id));
+        }
+      }
+    });
+
+    function showFormMessage(form, message, type = "error") {
+      const container = form.querySelector('.message');
+      if (!container) return;
+      container.textContent = message;
+      container.classList.remove('error','success');
+      container.classList.add(type === 'success' ? 'success' : 'error');
+      container.style.display = 'block';
+      setTimeout(() => {
+        container.textContent = '';
+        container.className = 'message';
+        container.style.display = 'none';
+      }, 5000);
+    }
+
+    function clearFormMessage(form) {
+      const container = form.querySelector('.message');
+      if (!container) return;
+      container.textContent = '';
+      container.className = 'message';
+      container.style.display = 'none';
+    }
+
+    function showFieldError(inputEl, message) {
+      const next = inputEl.nextElementSibling;
+      if (next && next.classList && next.classList.contains('field-error')) {
+        next.remove();
+      }
+      inputEl.classList.add('input-error');
+      inputEl.setAttribute('aria-invalid','true');
+      const span = document.createElement('span');
+      span.className = 'field-error';
+      span.textContent = message;
+      inputEl.parentNode.insertBefore(span, inputEl.nextSibling);
+      setTimeout(() => {
+        inputEl.classList.remove('input-error');
+        inputEl.removeAttribute('aria-invalid');
+        if (span && span.parentNode) span.parentNode.removeChild(span);
+      }, 4000);
+    }
+
+    registerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const nickname = document.getElementById("nickname").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const gender = document.getElementById("gender").value;
+      const password = document.getElementById("password").value;
+
+      if (!nickname) {
+        showFieldError(document.getElementById("nickname"), "Please enter a nickname.");
+        showFormMessage(registerForm, "Please fix the errors and try again.", "error");
+        return;
+      }
+      if (!email) {
+        showFieldError(document.getElementById("email"), "Please enter an email.");
+        showFormMessage(registerForm, "Please fix the errors and try again.", "error");
+        return;
+      }
+      if (!gender) {
+        showFieldError(document.getElementById("gender"), "Please select a gender.");
+        showFormMessage(registerForm, "Please fix the errors and try again.", "error");
+        return;
+      }
+      if (!password || password.length < 6) {
+        showFieldError(document.getElementById("password"), "Password must be at least 6 characters.");
+        showFormMessage(registerForm, "Please fix the errors and try again.", "error");
+        return;
+      }
+
+      const formData = {
+        nickname,
+        email,
+        gender,
+        password
+      };
+
+      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", formData)
+        .then(() => {
+          localStorage.setItem(formData.email, JSON.stringify(formData));
+          fields.forEach(id => localStorage.removeItem(id));
+          showFormMessage(registerForm, "Registration successful! Redirecting...", "success");
+          registerForm.reset();
+          setTimeout(() => window.location.href = "main.html", 1000);
+        }, (err) => {
+          console.error("EmailJS Error:", err);
+          showFormMessage(registerForm, "Something went wrong sending registration. Check EmailJS config.", "error");
+        });
+    });
+
+    signinForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signin-email").value.trim();
+      const password = document.getElementById("signin-password").value;
+
+      const stored = localStorage.getItem(email);
+      if (!stored) {
+        showFormMessage(signinForm, "No account found for that email.", "error");
+        showFieldError(document.getElementById("signin-email"), "Email not registered.");
+        return;
+      }
+
+      let storedData;
+      try {
+        storedData = JSON.parse(stored);
+      } catch {
+        showFormMessage(signinForm, "Stored account data is invalid.", "error");
+        return;
+      }
+
+      if (storedData && storedData.password === password) {
+        showFormMessage(signinForm, "Sign in successful! Redirecting...", "success");
+        setTimeout(() => window.location.href = "main.html", 800);
+      } else {
+        showFormMessage(signinForm, "Invalid email or password.", "error");
+        showFieldError(document.getElementById("signin-password"), "Incorrect password.");
+      }
+    });
+  </script>
+
+</body>
+</html>
